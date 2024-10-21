@@ -2094,7 +2094,6 @@ releases:
         - omevv_firmware_repository_profile - This module allows to manage
           firmware repository profile.
       minor_changes:
-        - idrac_system_info - This module is enhanced to support iDRAC10 and OMSDK dependency is removed.
         - idrac_firmware_info - This module is enhanced to support iDRAC10 and OMSDK dependency is removed.
       bugfixes:
         - idrac_storage_volume - Issue(290766) - The module will report success
