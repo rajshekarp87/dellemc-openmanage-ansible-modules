@@ -26,7 +26,6 @@ Major Changes
 Minor Changes
 -------------
 
-- idrac_system_info - This module is enhanced to support iDRAC10 and OMSDK dependency is removed.
 - idrac_firmware_info - This module is enhanced to support iDRAC10 and OMSDK dependency is removed.
 
 Bugfixes
