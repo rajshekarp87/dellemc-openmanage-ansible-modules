@@ -1,0 +1,42 @@
+---
+- block:
+    - name: Delete baseline profile
+      dellemc.openmanage.omevv_baseline_profile:
+        state: absent
+        name: OMAM_Baseline_Profile
+      register: delete_baseline_profile
+
+    - name: Verify task status - Delete baseline profile
+      ansible.builtin.assert:
+        that:
+          - delete_baseline_profile.changed
+          - 'delete_baseline_profile.msg == "Successfully deleted the OMEVV
+            baseline profile."'
+
+    - name: Delete Repository profile
+      dellemc.openmanage.omevv_baseline_profile:
+        state: absent
+        name: OMAM_Firm_Repo
+      register: delete_firm_repo_profile
+
+    - name: Verify task status - Delete baseline profile
+      ansible.builtin.assert:
+        that:
+          - delete_firm_repo_profile.changed
+          - 'delete_firm_repo_profile.msg == "Successfully deleted the OMEVV
+            firmware repository profile."'
+
+  module_defaults:
+    dellemc.openmanage.omevv_baseline_profile:
+      validate_certs: "{{ validate_certs }}"
+      hostname: "{{ hostname | ansible.utils.ipwrap }}"
+      vcenter_username: "{{ vcenter_username }}"
+      vcenter_password: "{{ vcenter_password }}"
+      vcenter_uuid: "{{ uuid }}"
+
+    dellemc.openmanage.omevv_firmware_repository_profile:
+      validate_certs: "{{ validate_certs }}"
+      hostname: "{{ hostname | ansible.utils.ipwrap }}"
+      vcenter_username: "{{ vcenter_username }}"
+      vcenter_password: "{{ vcenter_password }}"
+      vcenter_uuid: "{{ uuid }}"
