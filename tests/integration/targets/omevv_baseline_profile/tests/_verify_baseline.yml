@@ -1,4 +1,4 @@
-# Retrieve baseline information from OMEVV
+ # Retrieve baseline information from OMEVV and verify against module output
 ---
 - block:
     - name: Retrieve Baseline information
