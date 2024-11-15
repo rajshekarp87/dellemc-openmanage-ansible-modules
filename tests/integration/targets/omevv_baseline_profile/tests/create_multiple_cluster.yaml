@@ -13,7 +13,9 @@
     is undefined
 
 - name: Set prerequisite
-  ansible.builtin.include_tasks: _helper_create.yml
+  ansible.builtin.include_tasks: _helper.yml
+  vars:
+    repository_profile_1_trigger: 1
 
 - block:
     - name: Create a baseline profile with multiple
@@ -86,6 +88,8 @@
 
     - name: Delete baseline profile created in previous task
       ansible.builtin.include_tasks: _cleanup.yml
+      vars:
+        delete_baseline_trigger: 1
 
     - name: Create a baseline profile with multiple cluster (Normal and Diff mode)
       dellemc.openmanage.omevv_baseline_profile:
@@ -110,6 +114,9 @@
   always:
     - name: Post clean up
       ansible.builtin.include_tasks: _cleanup.yml
+      vars:
+        delete_baseline_trigger: 1
+        delete_repository_profile_1_trigger: 1
 
   module_defaults:
     dellemc.openmanage.omevv_baseline_profile:

@@ -16,72 +16,84 @@
   ansible.builtin.include_tasks: _helper.yml
   vars:
     repository_profile_1_trigger: 1
-    repository_profile_2_trigger: 1
     baseline_trigger: 1
 
 - block:
-    - name: Modify a baseline profile (Check mode - Changes expected)
-      dellemc.openmanage.omevv_baseline_profile: &bp_multiple_cluster
-        state: present
+    - name: Delete a baseline profile (Check mode - Changes expected)
+      dellemc.openmanage.omevv_baseline_profile: &bp_delete
+        state: absent
         name: OMAM_Baseline_Profile
-        repository_profile: OMAM_Modify_Firm_Repo
-        cluster:
-          - OMAM-Cluster-1
-          - OMAM-Cluster-2
-        days:
-          - sunday
-          - wednesday
-          - saturday
-        time: "00:00"
       register: cm_result_baseline
       check_mode: true
 
-    - name: Verify task status - Modify a baseline profile (Check mode - Changes
-        expected)
+    - name: Verify task status - Delete a baseline
+        profile (Check mode - Changes expected)
       ansible.builtin.assert:
         that:
           - cm_result_baseline.changed
           - 'cm_result_baseline.msg == "Changes found to be applied."'
 
-    - name: Modify a baseline profile (Check and Diff mode)
+    - name: Delete a baseline profile (Check and Diff mode)
       dellemc.openmanage.omevv_baseline_profile:
-        <<: *bp_multiple_cluster
+        <<: *bp_delete
       check_mode: true
       diff: true
       register: cm_dm_result_baseline
 
-    - name: Verify task status - Modify a baseline profile (Check and Diff mode)
+    - name: Verify task status - Delete a baseline profile (Check and Diff mode)
       ansible.builtin.assert:
         that:
           - cm_dm_result_baseline.changed
           - 'cm_dm_result_baseline.msg == "Changes found to be applied."'
           - cm_dm_result_baseline.diff.before | length > 1
-          - cm_dm_result_baseline.diff.after | length > 1
+          - cm_dm_result_baseline.diff.after | length == 0
 
-    - name: Modify a baseline profile (Normal mode)
+    - name: Delete a baseline profile (Normal mode)
       dellemc.openmanage.omevv_baseline_profile:
-        <<: *bp_multiple_cluster
+        <<: *bp_delete
       register: normal_result_baseline
 
-    - name: Verify task status - Modify a baseline profile (Normal mode)
+    - name: Verify task status - Delete a baseline profile (Normal mode)
       ansible.builtin.assert:
         that:
           - normal_result_baseline.changed
-          - 'normal_result_baseline.msg == "Successfully modified the baseline
+          - 'normal_result_baseline.msg == "Successfully deleted the baseline
             profile."'
-          - normal_result_baseline.baseline_profile_info
 
-    - name: Modify a baseline profile (Idempotence)
+    - name: Verify baseline details
+      ansible.builtin.include_tasks: _verify_baseline.yml
+
+    - name: Delete a baseline profile (Idempotence)
       dellemc.openmanage.omevv_baseline_profile:
-        <<: *bp_multiple_cluster
+        <<: *bp_delete
       register: idempotence_result_baseline
 
-    - name: Verify task status - Modify a baseline profile (Idempotence)
+    - name: Verify task status - Delete a baseline profile (Idempotence)
       ansible.builtin.assert:
         that:
           - not idempotence_result_baseline.changed
           - 'idempotence_result_baseline.msg == "No changes found to be
             applied."'
+
+    - name: Prereq - Create a baseline profile
+      ansible.builtin.include_tasks: _helper.yml
+      vars:
+        baseline_trigger: 1
+
+    - name: Delete a baseline profile (Normal and Diff mode)
+      dellemc.openmanage.omevv_baseline_profile:
+        <<: *bp_delete
+      diff: true
+      register: normal_diff_result_baseline
+
+    - name: Verify task status - Delete a baseline profile (Normal and Diff mode)
+      ansible.builtin.assert:
+        that:
+          - normal_diff_result_baseline.changed
+          - 'normal_diff_result_baseline.msg == "Successfully deleted the
+            baseline profile."'
+          - normal_diff_result_baseline.diff.before | length > 1
+          - normal_diff_result_baseline.diff.after | length == 0
 
     - name: Verify baseline details
       ansible.builtin.include_tasks: _verify_baseline.yml
@@ -90,9 +102,7 @@
     - name: Post clean up
       ansible.builtin.include_tasks: _cleanup.yml
       vars:
-        baseline_profile_trigger: 1
         delete_repository_profile_1_trigger: 1
-        delete_repository_profile_2_trigger: 1
 
   module_defaults:
     dellemc.openmanage.omevv_baseline_profile:

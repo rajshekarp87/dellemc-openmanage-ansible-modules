@@ -9,6 +9,7 @@
         catalog_path: "{{ http_share_dir_path }}/omevv_baseline_profile_catalog.xml"
         protocol_type: HTTP
       register: firm_repo_1
+      when: repository_profile_1_trigger is defined
 
     - name: Verify task status - Create firmware repository profile - 1
       ansible.builtin.assert:
@@ -17,6 +18,7 @@
           - 'firm_repo_1.msg == "Successfully created the OMEVV firmware
             repository profile."'
           - firm_repo_1.profile_info.status == "Success"
+      when: repository_profile_1_trigger is defined
 
     - name: Create firmware repository profile - 2
       dellemc.openmanage.omevv_firmware_repository_profile:
@@ -26,6 +28,7 @@
         catalog_path: "{{ http_share_dir_path }}/omevv_baseline_profile_catalog.xml"
         protocol_type: HTTP
       register: firm_repo_2
+      when: repository_profile_2_trigger is defined
 
     - name: Verify task status - Create firmware repository profile - 2
       ansible.builtin.assert:
@@ -34,17 +37,19 @@
           - 'firm_repo_2.msg == "Successfully created the OMEVV firmware
             repository profile."'
           - firm_repo_2.profile_info.status == "Success"
+      when: repository_profile_2_trigger is defined
 
     - name: Create a baseline profile with single cluster
       dellemc.openmanage.omevv_baseline_profile:
         state: present
         name: OMAM_Baseline_Profile
-        repository_profile: OMAM_Modify_Firm_Repo
+        repository_profile: OMAM_Firm_Repo
         cluster: OMAM-Cluster-1
         days:
           - all
         time: "12:00"
       register: result_baseline
+      when: baseline_trigger is defined
 
     - name: Verify task status - Create a baseline profile with single cluster
       ansible.builtin.assert:
@@ -52,6 +57,7 @@
           - result_baseline.changed is true
           - result_baseline.msg == "Successfully created the baseline profile."
           - result_baseline.baseline_profile_info
+      when: baseline_trigger is defined
 
   module_defaults:
     dellemc.openmanage.omevv_firmware_repository_profile:
