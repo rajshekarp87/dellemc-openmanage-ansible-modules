@@ -40,7 +40,8 @@
           - cm_result_baseline.changed
           - 'cm_result_baseline.msg == "Changes found to be applied."'
 
-    - name: Create a baseline profile with multiple cluster (Check and Diff mode)
+    - name: Create a baseline profile with multiple
+        cluster (Check and Diff mode)
       dellemc.openmanage.omevv_baseline_profile:
         <<: *bp_multiple_cluster
       check_mode: true
@@ -91,7 +92,8 @@
       vars:
         delete_baseline_trigger: 1
 
-    - name: Create a baseline profile with multiple cluster (Normal and Diff mode)
+    - name: Create a baseline profile with multiple
+        cluster (Normal and Diff mode)
       dellemc.openmanage.omevv_baseline_profile:
         <<: *bp_multiple_cluster
       diff: true
