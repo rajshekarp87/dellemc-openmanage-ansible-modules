@@ -31,7 +31,7 @@
         days:
           - sunday
           - wednesday
-          - saturday
+          - saturdayGi
         time: "00:00"
       register: cm_result_baseline
       check_mode: true
