@@ -9,8 +9,8 @@
     - name: Verify task status - Retrieve Baseline information
       ansible.builtin.assert:
         that:
-          - 'baseline_info.baseline_profile_info == 
-            normal_result_baseline.profile_info'
+          - "baseline_info.baseline_profile_info == 
+            normal_result_baseline.profile_info"
 
   module_defaults:
     dellemc.openmanage.omevv_baseline_profile_info:
