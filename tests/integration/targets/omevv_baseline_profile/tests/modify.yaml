@@ -28,6 +28,7 @@
         cluster:
           - OMAM-Cluster-1
           - OMAM-Cluster-2
+
         days:
           - sunday
           - wednesday
