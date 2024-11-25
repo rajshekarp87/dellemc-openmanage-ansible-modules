@@ -18,12 +18,15 @@
     - name: Intializing cluster_name variable
       ansible.builtin.set_fact:
         cluster_name: []
+        group_id: []
+        cluster_id: []
       when: fetch_cluster_trigger is defined
 
     - name: Find the CLUSTER group
       ansible.builtin.set_fact:
         cluster_name: "{{ cluster_name + [item.consoleEntityName] }}"
-        group_id: "{{ item.groupId }}"
+        group_id: "{{ group_id + [item.groupId] }}"
+        cluster_id: "{{ cluster_id + [item.consoleEntityId] }}"
       loop: "{{ group_details.json }}"
       when:
         - item.groupType == "CLUSTER"
@@ -38,8 +41,7 @@
         name: "OMAM_Firm_Repo"
         description: "Firmware repository profile created by OMAM"
         state: present
-        catalog_path: "{{ http_share_dir_path }}/
-          omevv_baseline_profile_catalog.xml"
+        catalog_path: "{{ http_share_dir_path }}/omevv_baseline_profile_catalog.xml"
         protocol_type: HTTP
       register: firm_repo_1
       when: repository_profile_1_trigger is defined
@@ -58,8 +60,7 @@
         name: "OMAM_Modify_Firm_Repo"
         description: "Firmware repository profile created by OMAM"
         state: present
-        catalog_path: "{{ http_share_dir_path }}/
-          omevv_baseline_profile_catalog.xml"
+        catalog_path: "{{ http_share_dir_path }}/omevv_baseline_profile_catalog.xml"
         protocol_type: HTTP
       register: firm_repo_2
       when: repository_profile_2_trigger is defined

@@ -49,6 +49,19 @@
       diff: true
       register: cm_dm_result_baseline
 
+    - name: Store cluster details for verification
+      ansible.builtin.set_fact:
+        cluster_name_1: "{{ cluster_name[0] }}"
+        cluster_name_2: "{{ cluster_name[1] }}"
+        cluster_id_1: "{{ cluster_id[0] }}"
+        cluster_id_2: "{{ cluster_id[1] }}"
+        group_id_1: "{{ group_id[0] }}"
+        group_id_2: "{{ group_id[1] }}"
+        module_group_id_1: "{{
+          cm_dm_result_baseline.diff.after.clusterGroups[0].omevv_groupID }}"
+        module_group_id_2: "{{
+          cm_dm_result_baseline.diff.after.clusterGroups[1].omevv_groupID }}"
+
     - name: Verify task status - Create a baseline profile with multiple
         cluster (Check and Diff mode - Changes expected)
       ansible.builtin.assert:
@@ -57,6 +70,37 @@
           - 'cm_dm_result_baseline.msg == "Changes found to be applied."'
           - cm_dm_result_baseline.diff.before | length == 0
           - cm_dm_result_baseline.diff.after | length > 1
+          - >
+            cm_dm_result_baseline.diff.after.clusterGroups[0].clusterID
+            == cluster_id_1
+          - >
+            cm_dm_result_baseline.diff.after.clusterGroups[1].clusterID
+            == cluster_id_2
+          - >
+            cm_dm_result_baseline.diff.after.clusterGroups[0].clusterName
+            == cluster_name_1
+          - >
+            cm_dm_result_baseline.diff.after.clusterGroups[1].clusterName
+            == cluster_name_2
+          - module_group_id_1 == group_id_1
+          - module_group_id_2 == group_id_2
+          - cm_dm_result_baseline.diff.after.jobSchedule.friday == true
+          - cm_dm_result_baseline.diff.after.jobSchedule.monday == true
+          - cm_dm_result_baseline.diff.after.jobSchedule.saturday == true
+          - cm_dm_result_baseline.diff.after.jobSchedule.sunday == true
+          - cm_dm_result_baseline.diff.after.jobSchedule.thursday == true
+          - 'cm_dm_result_baseline.diff.after.jobSchedule.time == "00:00"'
+          - cm_dm_result_baseline.diff.after.jobSchedule.tuesday == true
+          - cm_dm_result_baseline.diff.after.jobSchedule.wednesday == true
+          - 'cm_dm_result_baseline.diff.after.name == "OMAM_Baseline_Profile"'
+          - >
+            'cm_dm_result_baseline.diff.after.repository_profile
+            == "OMAM_Firm_Repo"'
+
+    - name: Set prerequisite
+      ansible.builtin.include_tasks: _helper.yml
+      vars:
+        fetch_cluster_trigger: 1
 
     - name: Create a baseline profile with multiple cluster (Normal mode)
       dellemc.openmanage.omevv_baseline_profile:
@@ -71,6 +115,10 @@
           - 'normal_result_baseline.msg == "Successfully created the baseline
             profile."'
           - normal_result_baseline.baseline_profile_info
+
+    - name: Store baseline_profile_info data to a variable for verification
+      ansible.builtin.set_fact:
+        profile_info: "{{ normal_result_baseline.baseline_profile_info }}"
 
     - name: Verify baseline details
       ansible.builtin.include_tasks: _verify_baseline.yml
@@ -93,6 +141,11 @@
       vars:
         delete_baseline_trigger: 1
 
+    - name: Set prerequisite
+      ansible.builtin.include_tasks: _helper.yml
+      vars:
+        fetch_cluster_trigger: 1
+
     - name: Create a baseline profile with multiple
         cluster (Normal and Diff mode)
       dellemc.openmanage.omevv_baseline_profile:
@@ -110,6 +163,38 @@
           - normal_diff_result_baseline.baseline_profile_info
           - normal_diff_result_baseline.diff.before | length == 0
           - normal_diff_result_baseline.diff.after | length > 1
+          - >
+            normal_diff_result_baseline.diff.after.clusterGroups[0].clusterID
+            == cluster_id_1
+          - >
+            normal_diff_result_baseline.diff.after.clusterGroups[1].clusterID
+            == cluster_id_2
+          - >
+            normal_diff_result_baseline.diff.after.clusterGroups[0].clusterName
+            == cluster_name_1
+          - >
+            normal_diff_result_baseline.diff.after.clusterGroups[1].clusterName
+            == cluster_name_2
+          - module_group_id_1 == group_id_1
+          - module_group_id_2 == group_id_2
+          - normal_diff_result_baseline.diff.after.jobSchedule.friday == true
+          - normal_diff_result_baseline.diff.after.jobSchedule.monday == true
+          - normal_diff_result_baseline.diff.after.jobSchedule.saturday == true
+          - normal_diff_result_baseline.diff.after.jobSchedule.sunday == true
+          - normal_diff_result_baseline.diff.after.jobSchedule.thursday == true
+          - 'normal_diff_result_baseline.diff.after.jobSchedule.time == "00:00"'
+          - normal_diff_result_baseline.diff.after.jobSchedule.tuesday == true
+          - normal_diff_result_baseline.diff.after.jobSchedule.wednesday == true
+          - >
+            'normal_diff_result_baseline.diff.after.name
+            == "OMAM_Baseline_Profile"'
+          - >
+            'cm_dm_result_baseline.diff.after.repository_profile
+            == "OMAM_Firm_Repo"'
+
+    - name: Store baseline_profile_info data to a variable for verification
+      ansible.builtin.set_fact:
+        profile_info: "{{ normal_diff_result_baseline.baseline_profile_info }}"
 
     - name: Verify baseline details
       ansible.builtin.include_tasks: _verify_baseline.yml
