@@ -86,7 +86,8 @@
       diff: true
       register: normal_diff_result_baseline
 
-    - name: Verify task status - Delete a baseline profile (Normal and Diff mode)
+    - name: Verify task status - Delete a baseline profile (Normal and
+        Diff mode)
       ansible.builtin.assert:
         that:
           - normal_diff_result_baseline.changed
