@@ -17,6 +17,7 @@
   vars:
     repository_profile_1_trigger: 1
     repository_profile_2_trigger: 1
+    fetch_cluster_trigger: 1
     baseline_trigger: 1
 
 - block:
@@ -26,13 +27,12 @@
         name: OMAM_Baseline_Profile
         repository_profile: OMAM_Modify_Firm_Repo
         cluster:
-          - OMAM-Cluster-1
-          - OMAM-Cluster-2
-
+          - "{{ cluster_name[0] }}"
+          - "{{ cluster_name[1] }}"
         days:
           - sunday
           - wednesday
-          - saturdayGi
+          - saturday
         time: "00:00"
       register: cm_result_baseline
       check_mode: true
@@ -92,6 +92,7 @@
       ansible.builtin.include_tasks: _cleanup.yml
       vars:
         baseline_profile_trigger: 1
+        delete_baseline_trigger: 1
         delete_repository_profile_1_trigger: 1
         delete_repository_profile_2_trigger: 1
 

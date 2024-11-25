@@ -15,6 +15,7 @@
 - name: Set prerequisite
   ansible.builtin.include_tasks: _helper.yml
   vars:
+    fetch_cluster_trigger: 1
     repository_profile_1_trigger: 1
 
 - block:
@@ -25,8 +26,8 @@
         name: OMAM_Baseline_Profile
         repository_profile: OMAM_Firm_Repo
         cluster:
-          - OMAM-Cluster-1
-          - OMAM-Cluster-2
+          - "{{ cluster_name[0] }}"
+          - "{{ cluster_name[1] }}"
         days:
           - all
         time: "00:00"

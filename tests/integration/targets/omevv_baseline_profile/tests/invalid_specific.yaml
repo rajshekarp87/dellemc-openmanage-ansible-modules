@@ -14,6 +14,7 @@
 - name: Set prerequisite
   ansible.builtin.include_tasks: _helper.yml
   vars:
+    fetch_cluster_trigger: 1
     repository_profile_1_trigger: 1
 
 - block:
@@ -40,7 +41,7 @@
       dellemc.openmanage.omevv_baseline_profile:
         state: present
         name: "Profile Name"
-        cluster: "OMAM-Cluster-1"
+        cluster: "{{ cluster_name[0] }}"
         repository_profile: "Invalid repository"
         days: "sunday"
         time: "23:00"
@@ -59,7 +60,7 @@
       dellemc.openmanage.omevv_baseline_profile:
         state: present
         name: "Profile Name"
-        cluster: "OMAM-Cluster-1"
+        cluster: "{{ cluster_name[0] }}"
         repository_profile: "OMAM_Firm_Repo"
         days: "sunday"
         time: "25:00"
@@ -71,7 +72,7 @@
         that:
           - invalid_time.failed
           - not invalid_time.changed
-          - 'invalid_repository.msg == ""Invalid value for time. Enter the value
+          - 'invalid_time.msg == "Invalid value for time. Enter the value
             in positive integer."'
 
   always:

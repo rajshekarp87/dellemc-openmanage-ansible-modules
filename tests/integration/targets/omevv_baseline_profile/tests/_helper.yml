@@ -1,6 +1,38 @@
 # Create repository profile and baseline profile
 ---
 - block:
+    - name: Get group details
+      ansible.builtin.uri:
+        url: https://{{ hostname | ansible.utils.ipwrap }}:{{ port
+          }}/omevv/GatewayService/v1/Consoles/{{ uuid }}/Groups
+        user: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: false
+        force_basic_auth: true
+        status_code: 200
+        headers:
+          x_omivv-api-vcenter-identifier: "{{ uuid }}"
+      register: group_details
+      when: fetch_cluster_trigger is defined
+
+    - name: Intializing cluster_name variable
+      ansible.builtin.set_fact:
+        cluster_name: []
+      when: fetch_cluster_trigger is defined
+
+    - name: Find the CLUSTER group
+      ansible.builtin.set_fact:
+        cluster_name: "{{ cluster_name + [item.consoleEntityName] }}"
+        group_id: "{{ item.groupId }}"
+      loop: "{{ group_details.json }}"
+      when:
+        - item.groupType == "CLUSTER"
+        - fetch_cluster_trigger is defined
+      register: cluster_result
+      until: cluster_result is defined
+      retries: 1
+      delay: 0
+
     - name: Create firmware repository profile - 1
       dellemc.openmanage.omevv_firmware_repository_profile:
         name: "OMAM_Firm_Repo"
@@ -46,7 +78,7 @@
         state: present
         name: OMAM_Baseline_Profile
         repository_profile: OMAM_Firm_Repo
-        cluster: OMAM-Cluster-1
+        cluster: "{{ cluster_name[0] }}"
         days:
           - all
         time: "12:00"

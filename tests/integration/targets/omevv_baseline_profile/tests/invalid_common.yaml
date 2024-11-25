@@ -62,9 +62,9 @@
           - invalid_port_1.failed
           - not invalid_port_1.changed
           - 'invalid_port_1.msg == "Invalid port number. Enter the valid port
-             number."'
+            number."'
           - 'invalid_port_1.error_info.message == "Invalid port number. Enter
-             the valid port number."'
+            the valid port number."'
 
     - name: Negative - invalid port - 2
       dellemc.openmanage.omevv_baseline_profile:
@@ -84,6 +84,30 @@
           - 'invalid_port_2.error_info.message == "Invalid port number. Enter
             the valid port number."'
 
+    - name: Negative - unconfigured port
+      dellemc.openmanage.omevv_baseline_profile:
+        port: 444
+        state: absent
+        name: "Profile Name"
+      register: unconfigured_port
+      ignore_unreachable: true
+
+    - name: Set facts for uncfigured posrt msg assertion
+      ansible.builtin.set_fact:
+        expected_unconfigured_port_msg: "The URL with IP {{ hostname }} and port
+          444 cannot be reached."
+
+    - name: Verify task status - Negative - unconfigured port
+      ansible.builtin.assert:
+        that:
+          - unconfigured_port.unreachable
+          - not unconfigured_port.failed
+          - not unconfigured_port.changed
+          - 'unconfigured_port.msg == expected_unconfigured_port_msg'
+          - 'unconfigured_port.error_info.message == "<urlopen error [Errno 113]
+            No route to host>"'
+          - 'unconfigured_port.error_info.type == "URLError"'
+
     - name: Negative - invalid username
       dellemc.openmanage.omevv_baseline_profile:
         vcenter_username: invalid
@@ -97,7 +121,7 @@
         that:
           - invalid_username.failed
           - not invalid_username.changed
-          - 'invalid_username.msg == "The read operation timed out"'
+          - 'invalid_username.msg == "Invalid Credentials."'
 
     - name: Negative - invalid password
       dellemc.openmanage.omevv_baseline_profile:
@@ -112,7 +136,7 @@
         that:
           - invalid_password.failed
           - not invalid_password.changed
-          - 'invalid_password.msg == "The read operation timed out"'
+          - 'invalid_password.msg == "Invalid Credentials."'
 
     - name: Negative - invalid validate_certs
       dellemc.openmanage.omevv_baseline_profile:
@@ -180,8 +204,8 @@
         that:
           - invalid_timeout_value.failed
           - not invalid_timeout_value.changed
-          - 'invalid_timeout_value.msg == "The value for the
-            job_wait_timeout parameter cannot be negative or zero."'
+          - 'invalid_timeout_value.msg == "Invalid timeout value. Enter the
+            valid positive integer."'
 
     - name: Negative - invalid vcenter uuid
       dellemc.openmanage.omevv_baseline_profile:
@@ -198,6 +222,9 @@
           - not invalid_uuid.changed
           - 'invalid_uuid.msg == "vCenter with UUID invalid is not
             registered."'
+          - 'invalid_uuid.error_info.errorCode == "12027"'
+          - 'invalid_uuid.error_info.message == "vCenter with UUID invalid is
+            not registered."'
 
   module_defaults:
     dellemc.openmanage.omevv_baseline_profile:
